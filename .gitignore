@@ -18,6 +18,8 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+commands/git
+commands/
 .venv/
 venv/
 python-service/.venv/
@@ -41,4 +43,3 @@ tmp/
 # Local storage
 data/
 postgres-data/
-commands/

@@ -25,6 +25,8 @@ docker compose up -d postgres
 
 This starts PostgreSQL on `localhost:5432` with:
 
+- host: `localhost` or `127.0.0.1`
+- port: `5432`
 - database: `assessment_db`
 - user: `assessment_user`
 - password: `assessment_pass`
