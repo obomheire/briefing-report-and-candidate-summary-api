@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { CandidateDocument } from '../entities/candidate-document.entity';
 import { CandidateSummary } from '../entities/candidate-summary.entity';
+import { SampleCandidate } from '../entities/sample-candidate.entity';
 import { QueueService } from '../queue/queue.service';
 import { CandidatesService, SUMMARY_JOB_NAME } from './candidates.service';
 
@@ -27,6 +28,7 @@ const mockSummaryRepository = () => ({
   save: jest.fn(),
   find: jest.fn(),
   findOne: jest.fn(),
+  findAndCount: jest.fn(),
 });
 
 const mockQueueService = () => ({
@@ -49,6 +51,7 @@ describe('CandidatesService', () => {
         CandidatesService,
         { provide: getRepositoryToken(CandidateDocument), useValue: documentRepo },
         { provide: getRepositoryToken(CandidateSummary), useValue: summaryRepo },
+        { provide: getRepositoryToken(SampleCandidate), useValue: {} },
         { provide: QueueService, useValue: queueService },
       ],
     }).compile();
@@ -145,15 +148,19 @@ describe('CandidatesService', () => {
     it('returns summaries scoped to candidate and workspace', async () => {
       allowAccess();
       const summaries = [{ id: 'sum-1' }, { id: 'sum-2' }];
-      summaryRepo.find.mockResolvedValue(summaries);
+      summaryRepo.findAndCount.mockResolvedValue([summaries, 2]);
 
-      const result = await service.listSummaries(USER, CANDIDATE_ID);
+      const query = { page: 1, size: 10 };
+      const result = await service.listSummaries(USER, CANDIDATE_ID, query);
 
-      expect(summaryRepo.find).toHaveBeenCalledWith({
+      expect(summaryRepo.findAndCount).toHaveBeenCalledWith({
         where: { candidateId: CANDIDATE_ID, workspaceId: USER.workspaceId },
         order: { createdAt: 'DESC' },
+        skip: 0,
+        take: 10,
       });
-      expect(result).toHaveLength(2);
+      expect(result.data).toHaveLength(2);
+      expect(result.total).toBe(2);
     });
   });
 
