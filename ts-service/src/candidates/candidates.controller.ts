@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 
@@ -13,10 +14,11 @@ import { CurrentUser } from '../auth/auth-user.decorator';
 import { AuthUser } from '../auth/auth.types';
 import { FakeAuthGuard } from '../auth/fake-auth.guard';
 import { CandidatesService } from './candidates.service';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UploadDocumentDto } from './dto/upload-document.dto';
 import { SummaryWorker } from './summary.worker';
 
-@Controller('candidates/:candidateId')
+@Controller('candidates')
 @UseGuards(FakeAuthGuard)
 export class CandidatesController {
   constructor(
@@ -24,7 +26,15 @@ export class CandidatesController {
     private readonly summaryWorker: SummaryWorker,
   ) {}
 
-  @Post('documents')
+  @Get()
+  listCandidates(
+    @CurrentUser() user: AuthUser,
+    @Query() query: PaginationQueryDto,
+  ) {
+    return this.candidatesService.listCandidates(user, query);
+  }
+
+  @Post(':candidateId/documents')
   @HttpCode(HttpStatus.CREATED)
   async uploadDocument(
     @CurrentUser() user: AuthUser,
@@ -34,7 +44,7 @@ export class CandidatesController {
     return this.candidatesService.uploadDocument(user, candidateId, dto);
   }
 
-  @Post('summaries/generate')
+  @Post(':candidateId/summaries/generate')
   @HttpCode(HttpStatus.ACCEPTED)
   async generateSummary(
     @CurrentUser() user: AuthUser,
@@ -52,7 +62,7 @@ export class CandidatesController {
     return summary;
   }
 
-  @Get('summaries')
+  @Get(':candidateId/summaries')
   async listSummaries(
     @CurrentUser() user: AuthUser,
     @Param('candidateId') candidateId: string,
@@ -60,7 +70,7 @@ export class CandidatesController {
     return this.candidatesService.listSummaries(user, candidateId);
   }
 
-  @Get('summaries/:summaryId')
+  @Get(':candidateId/summaries/:summaryId')
   async getSummary(
     @CurrentUser() user: AuthUser,
     @Param('candidateId') candidateId: string,

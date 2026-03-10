@@ -6,7 +6,6 @@ import { CandidateSummary } from '../entities/candidate-summary.entity';
 import { SampleCandidate } from '../entities/sample-candidate.entity';
 import { LlmModule } from '../llm/llm.module';
 import { QueueModule } from '../queue/queue.module';
-import { CandidatesListController } from './candidates-list.controller';
 import { CandidatesController } from './candidates.controller';
 import { CandidatesService } from './candidates.service';
 import { SummaryWorker } from './summary.worker';
@@ -17,7 +16,7 @@ import { SummaryWorker } from './summary.worker';
     QueueModule,
     LlmModule,
   ],
-  controllers: [CandidatesListController, CandidatesController],
+  controllers: [CandidatesController],
   providers: [CandidatesService, SummaryWorker],
 })
 export class CandidatesModule {}
