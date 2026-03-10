@@ -66,8 +66,9 @@ export class CandidatesController {
   async listSummaries(
     @CurrentUser() user: AuthUser,
     @Param('candidateId') candidateId: string,
+    @Query() query: PaginationQueryDto,
   ) {
-    return this.candidatesService.listSummaries(user, candidateId);
+    return this.candidatesService.listSummaries(user, candidateId, query);
   }
 
   @Get(':candidateId/summaries/:summaryId')

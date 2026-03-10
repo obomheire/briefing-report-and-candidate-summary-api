@@ -106,13 +106,18 @@ export class CandidatesService {
   async listSummaries(
     user: AuthUser,
     candidateId: string,
-  ): Promise<CandidateSummary[]> {
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResult<CandidateSummary>> {
     await this.assertCandidateBelongsToWorkspace(candidateId, user.workspaceId);
 
-    return this.summaryRepository.find({
+    const { page, size } = query;
+    const [data, total] = await this.summaryRepository.findAndCount({
       where: { candidateId, workspaceId: user.workspaceId },
       order: { createdAt: 'DESC' },
+      skip: (page - 1) * size,
+      take: size,
     });
+    return { data, total, page, size };
   }
 
   async getSummary(

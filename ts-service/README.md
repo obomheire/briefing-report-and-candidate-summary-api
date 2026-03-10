@@ -70,6 +70,18 @@ Migrations live in `src/migrations/` and are tracked in the `typeorm_migrations`
 
 ---
 
+## Seed the Database
+
+After running migrations, seed `workspace-1` and 10 sample candidates:
+
+```bash
+npm run seed
+```
+
+The seed script lives at `scripts/seed-candidates.ts` and uses the same `DATABASE_URL` env var as the service. Re-running is safe — existing rows are skipped.
+
+---
+
 ## Run the Service
 
 Development (with watch/reload):
@@ -95,10 +107,37 @@ All endpoints require auth headers (see **Authentication** below).
 
 | Method | Path | Status | Description |
 |---|---|---|---|
+| `GET` | `/candidates` | 200 | List candidates in the workspace (paginated) |
 | `POST` | `/candidates/:candidateId/documents` | 201 | Upload a candidate document |
 | `POST` | `/candidates/:candidateId/summaries/generate` | 202 | Request async summary generation |
 | `GET` | `/candidates/:candidateId/summaries` | 200 | List summaries for a candidate |
 | `GET` | `/candidates/:candidateId/summaries/:summaryId` | 200 | Get a single summary |
+
+### Example: List candidates
+
+```bash
+curl "http://localhost:3000/candidates?page=1&size=20" \
+  -H "x-user-id: user-1" \
+  -H "x-workspace-id: workspace-1"
+```
+
+Query parameters:
+
+| Parameter | Default | Description |
+|---|---|---|
+| `page` | `1` | Page number (1-based) |
+| `size` | `20` | Items per page (max 100) |
+
+Response shape:
+
+```json
+{
+  "data": [...],
+  "total": 10,
+  "page": 1,
+  "size": 20
+}
+```
 
 ### Example: Upload a document
 
@@ -150,7 +189,7 @@ Requests missing either header receive `401 Unauthorized`.
 
 ## LLM Configuration
 
-The service uses the **Google Gemini API** (`gemini-1.5-flash`) for summary generation.
+The service uses the **Google Gemini API** (`gemini-2.0-flash`) for summary generation.
 
 ### Get an API key
 
@@ -195,11 +234,14 @@ src/
     auth-user.decorator.ts       # @CurrentUser() parameter decorator
     auth.types.ts                # AuthUser interface
   candidates/
-    candidates.controller.ts     # 4 route handlers
+    candidates.controller.ts     # 5 route handlers (list, upload, generate, list summaries, get summary)
     candidates.service.ts        # CRUD + access control logic
     summary.worker.ts            # Queue consumer — calls provider, persists result
     dto/
       upload-document.dto.ts     # Validated document upload input
+      pagination-query.dto.ts    # Validated page/size query params
+  scripts/
+    seed-candidates.ts           # Seeds workspace-1 and 10 candidates (npm run seed)
   entities/
     candidate-document.entity.ts # Document ORM entity
     candidate-summary.entity.ts  # Summary ORM entity (status, score, etc.)

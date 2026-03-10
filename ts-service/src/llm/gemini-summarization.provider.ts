@@ -9,7 +9,7 @@ import {
   SummarizationProvider,
 } from './summarization-provider.interface';
 
-export const GEMINI_MODEL = 'gemini-1.5-flash';
+export const GEMINI_MODEL = "gemini-2.0-flash";
 export const PROMPT_VERSION = '1.0';
 
 const SYSTEM_PROMPT = `You are a senior technical recruiter evaluating a candidate.
