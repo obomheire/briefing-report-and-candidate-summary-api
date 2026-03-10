@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ report.report_title }}</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        margin: 0;
+        padding: 2rem 3rem;
+        background: #f9fafb;
+        color: #1f2937;
+        line-height: 1.6;
+      }
+
+      .report {
+        max-width: 860px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 2.5rem 3rem;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      }
+
+      /* ── Header ─────────────────────────────────────────── */
+      .report-header {
+        border-bottom: 3px solid #1d4ed8;
+        padding-bottom: 1.25rem;
+        margin-bottom: 1.75rem;
+      }
+
+      .report-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1d4ed8;
+        margin: 0 0 0.5rem;
+      }
+
+      .company-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-size: 0.9rem;
+        color: #4b5563;
+      }
+
+      .company-meta span strong {
+        color: #1f2937;
+      }
+
+      /* ── Sections ────────────────────────────────────────── */
+      section {
+        margin-bottom: 2rem;
+      }
+
+      section h2 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #374151;
+        border-left: 4px solid #1d4ed8;
+        padding-left: 0.65rem;
+        margin: 0 0 0.85rem;
+      }
+
+      section p {
+        margin: 0;
+        color: #374151;
+      }
+
+      /* ── Lists ───────────────────────────────────────────── */
+      ul.report-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      ul.report-list li {
+        position: relative;
+        padding-left: 1.25rem;
+        margin-bottom: 0.45rem;
+        color: #374151;
+      }
+
+      ul.report-list li::before {
+        content: "•";
+        position: absolute;
+        left: 0;
+        color: #1d4ed8;
+        font-weight: bold;
+      }
+
+      ul.report-list.risks li::before {
+        color: #dc2626;
+      }
+
+      /* ── Recommendation ──────────────────────────────────── */
+      .recommendation-box {
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 6px;
+        padding: 1rem 1.25rem;
+        color: #1e40af;
+        font-weight: 500;
+      }
+
+      /* ── Metrics table ───────────────────────────────────── */
+      table.metrics-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+
+      table.metrics-table th,
+      table.metrics-table td {
+        text-align: left;
+        padding: 0.55rem 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      table.metrics-table th {
+        background: #f3f4f6;
+        font-weight: 600;
+        color: #374151;
+      }
+
+      table.metrics-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      table.metrics-table td:last-child {
+        font-weight: 600;
+        color: #1d4ed8;
+      }
+
+      /* ── Footer ──────────────────────────────────────────── */
+      footer.report-footer {
+        border-top: 1px solid #e5e7eb;
+        margin-top: 2rem;
+        padding-top: 0.9rem;
+        font-size: 0.8rem;
+        color: #9ca3af;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <article class="report">
+
+      <!-- ── Header ─────────────────────────────────── -->
+      <header class="report-header">
+        <h1>{{ report.report_title }}</h1>
+        <div class="company-meta">
+          <span><strong>Analyst:</strong> {{ report.analyst_name }}</span>
+          <span><strong>Sector:</strong> {{ report.sector }}</span>
+          <span><strong>Ticker:</strong> {{ report.ticker }}</span>
+        </div>
+      </header>
+
+      <!-- ── Executive Summary ──────────────────────── -->
+      <section aria-labelledby="summary-heading">
+        <h2 id="summary-heading">Executive Summary</h2>
+        <p>{{ report.summary }}</p>
+      </section>
+
+      <!-- ── Key Points ─────────────────────────────── -->
+      <section aria-labelledby="keypoints-heading">
+        <h2 id="keypoints-heading">Key Points</h2>
+        <ul class="report-list">
+          {% for point in report.key_points %}
+            <li>{{ point }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <!-- ── Risks ──────────────────────────────────── -->
+      <section aria-labelledby="risks-heading">
+        <h2 id="risks-heading">Risks</h2>
+        <ul class="report-list risks">
+          {% for risk in report.risks %}
+            <li>{{ risk }}</li>
+          {% endfor %}
+        </ul>
+      </section>
+
+      <!-- ── Recommendation ─────────────────────────── -->
+      <section aria-labelledby="recommendation-heading">
+        <h2 id="recommendation-heading">Recommendation</h2>
+        <div class="recommendation-box">{{ report.recommendation }}</div>
+      </section>
+
+      <!-- ── Metrics (optional) ─────────────────────── -->
+      {% if report.metrics %}
+      <section aria-labelledby="metrics-heading">
+        <h2 id="metrics-heading">Key Metrics</h2>
+        <table class="metrics-table">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for metric in report.metrics %}
+            <tr>
+              <td>{{ metric.label }}</td>
+              <td>{{ metric.value }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      {% endif %}
+
+      <!-- ── Footer ─────────────────────────────────── -->
+      <footer class="report-footer">
+        <span>InsightOps — Internal Use Only</span>
+        <span>Generated: {{ report.generated_at_display }}</span>
+      </footer>
+
+    </article>
+  </body>
+</html>

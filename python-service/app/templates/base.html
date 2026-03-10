@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 2rem;
+        color: #1f2937;
+      }
+      main {
+        max-width: 800px;
+      }
+      footer {
+        margin-top: 2rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{{ title }}</h1>
+      <div>{{ body }}</div>
+    </main>
+    <footer>Generated at: {{ generated_at }}</footer>
+  </body>
+</html>
