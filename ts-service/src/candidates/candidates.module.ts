@@ -3,19 +3,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CandidateDocument } from '../entities/candidate-document.entity';
 import { CandidateSummary } from '../entities/candidate-summary.entity';
+import { SampleCandidate } from '../entities/sample-candidate.entity';
 import { LlmModule } from '../llm/llm.module';
 import { QueueModule } from '../queue/queue.module';
+import { CandidatesListController } from './candidates-list.controller';
 import { CandidatesController } from './candidates.controller';
 import { CandidatesService } from './candidates.service';
 import { SummaryWorker } from './summary.worker';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CandidateDocument, CandidateSummary]),
+    TypeOrmModule.forFeature([CandidateDocument, CandidateSummary, SampleCandidate]),
     QueueModule,
     LlmModule,
   ],
-  controllers: [CandidatesController],
+  controllers: [CandidatesListController, CandidatesController],
   providers: [CandidatesService, SummaryWorker],
 })
 export class CandidatesModule {}

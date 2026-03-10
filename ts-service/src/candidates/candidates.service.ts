@@ -7,8 +7,17 @@ import { Repository } from 'typeorm';
 import { AuthUser } from '../auth/auth.types';
 import { CandidateDocument } from '../entities/candidate-document.entity';
 import { CandidateSummary } from '../entities/candidate-summary.entity';
+import { SampleCandidate } from '../entities/sample-candidate.entity';
 import { QueueService } from '../queue/queue.service';
+import { PaginationQueryDto } from './dto/pagination-query.dto';
 import { UploadDocumentDto } from './dto/upload-document.dto';
+
+export interface PaginatedResult<T> {
+  data: T[];
+  total: number;
+  page: number;
+  size: number;
+}
 
 export const SUMMARY_JOB_NAME = 'candidate.summarize';
 
@@ -25,8 +34,26 @@ export class CandidatesService {
     private readonly documentRepository: Repository<CandidateDocument>,
     @InjectRepository(CandidateSummary)
     private readonly summaryRepository: Repository<CandidateSummary>,
+    @InjectRepository(SampleCandidate)
+    private readonly candidateRepository: Repository<SampleCandidate>,
     private readonly queueService: QueueService,
   ) {}
+
+  // ── Candidates ───────────────────────────────────────────────────────────
+
+  async listCandidates(
+    user: AuthUser,
+    query: PaginationQueryDto,
+  ): Promise<PaginatedResult<SampleCandidate>> {
+    const { page, size } = query;
+    const [data, total] = await this.candidateRepository.findAndCount({
+      where: { workspaceId: user.workspaceId },
+      order: { createdAt: 'ASC' },
+      skip: (page - 1) * size,
+      take: size,
+    });
+    return { data, total, page, size };
+  }
 
   // ── Documents ────────────────────────────────────────────────────────────
 
