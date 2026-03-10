@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.briefing import Briefing, BriefingMetric, BriefingPoint
@@ -44,6 +44,15 @@ def create_briefing(db: Session, payload: BriefingCreate) -> Briefing:
     db.commit()
     db.refresh(briefing)
     return _load_briefing(db, briefing.id)  # type: ignore[arg-type]
+
+
+def list_briefings(db: Session, page: int, size: int) -> tuple[list[Briefing], int]:
+    offset = (page - 1) * size
+    total = db.scalar(select(func.count()).select_from(Briefing)) or 0
+    rows = db.scalars(
+        select(Briefing).order_by(Briefing.created_at.desc()).offset(offset).limit(size)
+    ).all()
+    return list(rows), total
 
 
 def get_briefing(db: Session, briefing_id: int) -> Briefing | None:

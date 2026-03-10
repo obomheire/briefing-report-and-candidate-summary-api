@@ -127,6 +127,28 @@ class BriefingRead(BaseModel):
         )
 
 
+class BriefingListItem(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    company_name: str
+    ticker: str
+    sector: str | None
+    analyst_name: str
+    recommendation: str
+    is_generated: bool
+    generated_at: datetime | None
+    created_at: datetime
+
+
+class BriefingListResponse(BaseModel):
+    items: list[BriefingListItem]
+    total: int
+    page: int
+    size: int
+    pages: int
+
+
 class GenerateResponse(BaseModel):
     id: int
     is_generated: bool

@@ -1,15 +1,32 @@
+import math
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy.orm import Session
 
 from app.db.session import get_db
-from app.schemas.briefing import BriefingCreate, BriefingRead, GenerateResponse
+from app.schemas.briefing import BriefingCreate, BriefingListItem, BriefingListResponse, BriefingRead, GenerateResponse
 from app.services import briefing_formatter, briefing_service
 
 router = APIRouter(prefix="/briefings", tags=["briefings"])
 
 DbDep = Annotated[Session, Depends(get_db)]
+
+
+@router.get("", response_model=BriefingListResponse)
+def list_briefings(
+    db: DbDep,
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=20, ge=1, le=100),
+) -> BriefingListResponse:
+    briefings, total = briefing_service.list_briefings(db, page, size)
+    return BriefingListResponse(
+        items=[BriefingListItem.model_validate(b) for b in briefings],
+        total=total,
+        page=page,
+        size=size,
+        pages=math.ceil(total / size) if total else 0,
+    )
 
 
 @router.post("", response_model=BriefingRead, status_code=status.HTTP_201_CREATED)
