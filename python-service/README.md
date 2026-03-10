@@ -83,10 +83,42 @@ Interactive API docs available at: `http://localhost:8000/docs`
 
 | Method | Path | Description |
 |---|---|---|
+| `GET` | `/briefings` | List all briefings (paginated) |
 | `POST` | `/briefings` | Create a new briefing |
 | `GET` | `/briefings/{id}` | Retrieve a briefing's structured data |
 | `POST` | `/briefings/{id}/generate` | Generate and persist the HTML report |
 | `GET` | `/briefings/{id}/html` | Fetch the rendered HTML report |
+
+### Example: List briefings
+
+```bash
+# Default (page 1, 20 per page)
+curl http://localhost:8000/briefings
+
+# With pagination
+curl "http://localhost:8000/briefings?page=2&size=10"
+```
+
+Response shape:
+
+```json
+{
+  "items": [...],
+  "total": 42,
+  "page": 2,
+  "size": 10,
+  "pages": 5
+}
+```
+
+Query parameters:
+
+| Parameter | Default | Constraints | Description |
+|---|---|---|---|
+| `page` | `1` | >= 1 | Page number |
+| `size` | `20` | 1–100 | Items per page |
+
+Results are ordered by `created_at` descending (newest first).
 
 ### Example: Create a briefing
 
@@ -150,7 +182,7 @@ app/
   main.py              # FastAPI bootstrap and router wiring
   config.py            # Environment config (pydantic-settings)
   api/
-    briefings.py       # Briefing route handlers (4 endpoints)
+    briefings.py       # Briefing route handlers (5 endpoints)
     sample_items.py    # Starter example routes
     health.py          # Health check
   models/
@@ -160,7 +192,7 @@ app/
     briefing.py        # Pydantic request/response schemas + validation
     sample_item.py     # Starter example schemas
   services/
-    briefing_service.py    # CRUD operations (create, get, save HTML)
+    briefing_service.py    # CRUD operations (create, list, get, save HTML)
     briefing_formatter.py  # View model builder + Jinja2 render
   db/
     session.py         # SQLAlchemy engine and session factory
